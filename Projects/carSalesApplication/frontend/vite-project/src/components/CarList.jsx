@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { getAllCars } from "../utls/userHelper";
+import { Card, CardMedia, CardContent, Typography, Grid } from '@mui/material';
 
 
 const CarList = () => {
@@ -18,20 +19,37 @@ const CarList = () => {
     }, []);
 
     const handleClick = (id) => {
-        window.location.href = `/car/${id}`;
+      
+         window.location.href = `/car/${id}`;
       };
 
     return (
-      <div>
-        {cars.map((item, index) => (
-          <div key={index} onClick={() => handleClick(item.id)} >
-            <img src={item.photo} alt={`${item.make} ${item.model}`} height="140" width="120" />
-            <h3>{item.make} {item.model}</h3>
-            <p>Rating: {item.rating}</p>
-            <p>${item.price}</p>
-          </div>
-        ))}
-      </div>
+      <Grid container spacing={2}>
+      {cars.map((item, index) => (
+        <Grid item key={index} xs={12} sm={6} md={4} lg={3}>
+          <Card onClick={() => handleClick(item._id)} sx={{ cursor: 'pointer' }}>
+            <CardMedia
+              component="img"
+              image={item.photo}
+              alt={`${item.make} ${item.model}`}
+              height="140"
+              sx={{ objectFit: 'cover' }}
+            />
+            <CardContent>
+              <Typography variant="h6" component="div">
+                {item.make} {item.model}
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                Rating: {item.rating}
+              </Typography>
+              <Typography variant="body2" color="text.primary">
+                ${item.price}
+              </Typography>
+            </CardContent>
+          </Card>
+        </Grid>
+      ))}
+    </Grid>
     );
 }
 

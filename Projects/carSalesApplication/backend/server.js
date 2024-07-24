@@ -30,6 +30,16 @@ app.get("/car", async (req, res) => {
     }
 });
 
+app.get("/car/:id", async (req, res) => {
+  try{
+    const id = req.params.id;
+    const car = await Car.findById({_id: id})
+    res.status(200).send(car);
+  } catch (e) {
+    res.status(500).send(error);
+  }
+});
+
 app.delete("/car/:id", async (req, res) => {
     const carId = req.params.id;
     try {
