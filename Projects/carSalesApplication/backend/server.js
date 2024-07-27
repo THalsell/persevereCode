@@ -40,6 +40,16 @@ app.get("/car/:id", async (req, res) => {
   }
 });
 
+app.get("/carByMake", async (req, res) => {
+    const carMake = req.query.make 
+    try {
+        const car = await Car.find({ make: carMake })
+        res.status(200).send(car)
+    } catch (e) {
+        res.status(500).send(error)
+    }
+})
+
 app.delete("/car/:id", async (req, res) => {
     const carId = req.params.id;
     try {
