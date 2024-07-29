@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
 import { getAllCars } from "../utls/userHelper";
-import { Card, CardMedia, CardContent, Typography, Grid, Container, Button } from '@mui/material';
+import { Card, CardMedia, CardContent, Typography, Grid, Container, Button, TextField, Box } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { Link } from 'react-router-dom';
 
-
+// Create styled components for CarList
 const StyledCard = styled(Card)(({ theme }) => ({
     cursor: 'pointer',
     transition: 'transform 0.2s, box-shadow 0.2s',
@@ -12,6 +12,7 @@ const StyledCard = styled(Card)(({ theme }) => ({
         transform: 'scale(1.03)',
         boxShadow: theme.shadows[10],
     },
+    height: '350px', 
 }));
 
 const StyledContainer = styled(Container)(({ theme }) => ({
@@ -20,10 +21,7 @@ const StyledContainer = styled(Container)(({ theme }) => ({
 }));
 
 
-const StyledBackButton = styled(Button)(({ theme }) => ({
-    position: 'absolute',
-    top: theme.spacing(2),
-    left: theme.spacing(2),
+const StyledButton = styled(Button)(() => ({
     color: 'white',
     backgroundColor: 'black',
     boxShadow: 'none',
@@ -33,15 +31,26 @@ const StyledBackButton = styled(Button)(({ theme }) => ({
     },
 }));
 
+// Set fixed height for CardContent and handle overflow
+const StyledCardContent = styled(CardContent)({
+    height: '120px',
+    overflow: 'hidden',
+
+});
+
 const CarList = () => {
     const [cars, setCars] = useState([]);
+    const [search, setSearch] = useState('');
+    const [filteredCars, setFilteredCars] = useState([]);
 
+    // Fetch car data when the component mounts
     useEffect(() => {
         const fetchCars = async () => {
             try {
                 const data = await getAllCars();
                 if (data) {
                     setCars(data);
+                    setFilteredCars(data);
                 }
             } catch (error) {
                 console.error('Error fetching cars:', error);
@@ -51,6 +60,12 @@ const CarList = () => {
         fetchCars();
     }, []);
 
+    // Handle search functionality
+    const handleSearch = () => {
+        const filtered = cars.filter(car => car.make.toLowerCase().includes(search.toLowerCase()));
+        setFilteredCars(filtered);
+    };
+
     // Handle click event to navigate to the car details page
     const handleClick = (id) => {
         window.location.href = `/car/${id}`;
@@ -58,17 +73,30 @@ const CarList = () => {
 
     return (
         <StyledContainer maxWidth="lg">
-            <StyledBackButton 
+            <StyledButton 
                 component={Link} 
                 to="/"
+                sx={{ position: 'absolute', top: 16, left: 16 }}
             >
                 Back
-            </StyledBackButton>
+            </StyledButton>
             <Typography variant="h4" component="h1" gutterBottom>
                 Car Listings
             </Typography>
+            <Box display="flex" justifyContent="center" alignItems="center" mb={3}>
+                <TextField 
+                    label="Search by Make" 
+                    variant="outlined" 
+                    value={search} 
+                    onChange={(e) => setSearch(e.target.value)} 
+                    sx={{ mr: 2 }}
+                />
+                <StyledButton variant="contained" onClick={handleSearch}>
+                    Search
+                </StyledButton>
+            </Box>
             <Grid container spacing={3}>
-                {cars.map((item) => (
+                {filteredCars.map((item) => (
                     <Grid item key={item._id} xs={12} sm={6} md={4} lg={3}>
                         <StyledCard onClick={() => handleClick(item._id)}>
                             <CardMedia
@@ -78,7 +106,7 @@ const CarList = () => {
                                 height="200"
                                 sx={{ objectFit: 'cover' }}
                             />
-                            <CardContent>
+                            <StyledCardContent>
                                 <Typography variant="h6" component="div">
                                     {item.make} {item.model}
                                 </Typography>
@@ -88,7 +116,7 @@ const CarList = () => {
                                 <Typography variant="body2" color="text.primary">
                                     ${item.price}
                                 </Typography>
-                            </CardContent>
+                            </StyledCardContent>
                         </StyledCard>
                     </Grid>
                 ))}
